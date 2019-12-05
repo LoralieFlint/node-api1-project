@@ -44,14 +44,35 @@ server.get("/users/:id", (req, res) => {
       console.log("error on GET by ID /users/:id", err);
       res
         .status(500)
-        .json({ error: "The user information could not be retrieved." });
+        .json({ error: "The user information could not be found." });
     });
 });
 
-const port = 8000;
-const host = "127.0.0.1"; // another way to say local host
+// Creates a user using POST
+server.get("/users", (req, res) => {
+  const data = req.body;
 
-server.listen(port, host, () => {
-  console.log(`server running at http://${host}/${port}`);
+  if (!data.name || !data.bio) {
+    res
+      .status(400)
+      .json({ errorMessage: "Please provide name and bio for the user." });
+  } else {
+    db.insert(data)
+      .then(users => {
+        res.status(201).json(user);
+      })
+      .catch(err => {
+        console.log("error on POST to /users", err);
+        res
+          .status(500)
+          .json({ error: "The user information could not be retrieved." });
+      });
+  }
 });
-// server.use(express.json())
+
+const port = 8000;
+// const host = "127.0.0.1"; // another way to say local host
+
+server.listen(port, () => {
+  console.log(`server listening on port ${port}`);
+});
