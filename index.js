@@ -1,7 +1,3 @@
-// added dependancies
-
-// implement your API here
-
 // import express
 const express = require("express");
 // import database
@@ -87,6 +83,36 @@ server.delete("/users/:id", (req, res) => {
       console.log("error on DELETE /users/:id", err);
       res.status(500).json({ error: "The user could not be removed." });
     });
+});
+
+// updating user data with PUT
+server.put("/users/:id", (req, res) => {
+  const id = req.params.id;
+  const userData = req.body;
+
+  db.findById(id).then(users => {
+    if (!users) {
+      res
+        .status(404)
+        .json({ message: "The user with the specified ID does not exist." });
+    }
+  });
+  if (!userData.name || !userData.bio) {
+    res
+      .status(400)
+      .json({ errorMessage: "Please provide name and bio for the user." });
+  } else {
+    db.update(id, userData)
+      .then(user => {
+        res.status(200).json({ user: `user ${id} was updated ` });
+      })
+      .catch(err => {
+        console.log("error on PUT /users/:id", err);
+        res
+          .status(500)
+          .json({ error: "The user information could not be modified." });
+      });
+  }
 });
 
 const port = 8000;
