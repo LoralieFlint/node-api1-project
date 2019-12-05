@@ -49,7 +49,7 @@ server.get("/users/:id", (req, res) => {
 });
 
 // Creates a user using POST
-server.get("/users", (req, res) => {
+server.post("/users", (req, res) => {
   const data = req.body;
 
   if (!data.name || !data.bio) {
@@ -59,7 +59,7 @@ server.get("/users", (req, res) => {
   } else {
     db.insert(data)
       .then(users => {
-        res.status(201).json(user);
+        res.status(201).json(users);
       })
       .catch(err => {
         console.log("error on POST to /users", err);
@@ -68,6 +68,25 @@ server.get("/users", (req, res) => {
           .json({ error: "The user information could not be retrieved." });
       });
   }
+});
+
+// delete a user
+server.delete("/users/:id", (req, res) => {
+  const id = req.params.id;
+  db.remove(id)
+    .then(users => {
+      if (users) {
+        res.status(200).json({ message: "The user was removed." });
+      } else {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist." });
+      }
+    })
+    .catch(err => {
+      console.log("error on DELETE /users/:id", err);
+      res.status(500).json({ error: "The user could not be removed." });
+    });
 });
 
 const port = 8000;
